@@ -75,7 +75,7 @@ public class jfMain extends javax.swing.JFrame {
 
     //consulta SQL
     String consulta = "DROP TABLE IF EXISTS viviendas_alquiler;"
-            + "DROP TYPE IF EXISTS vivienda,direccion CASCADE;";
+            + "DROP TYPE IF EXISTS vivienda, direccion CASCADE;";
 
     //comando auxiliar para ejecutar la consulta
     Statement sta = conn.createStatement();
@@ -100,7 +100,22 @@ public class jfMain extends javax.swing.JFrame {
     //escribe la consulta SQL para construir el tipo 'vivienda', el tipo
     //'direccion', y la función 'publicidad', de acuerdo con las
     //indicaciones dadas
-    String consulta = "";
+    String consulta = "CREATE TYPE vivienda AS("
+            + "planta INTEGER,"
+            + "metros_2 INTEGER,"
+            + "num_habitaciones INTEGER,"
+            + "num_banios INTEGER,"
+            + "arrendador VARCHAR(25))";
+    
+    String consulta2 = "CREATE TYPE direccion AS("
+            + "calle VARCHAR(40),"
+            + "ciudad VARCHAR(25),"
+            + "provincia VARCHAR(25),"
+            + "codigo_postal VARCHAR(5))";
+    
+    String publicidad = "CREATE FUNCTION publicidad(vivienda) RETURNS varchar AS $$"
+            + "'Se alquila piso de '||SELECT $1.metros_2||' cuadrados en planta '|| $1.planta, "
+            + "||', con '||$1.num_habitaciones||' habitaciones y '||$1.num_banios||' baños.'";
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     
     //comando auxiliar para ejecutar la consulta
@@ -108,6 +123,8 @@ public class jfMain extends javax.swing.JFrame {
 
     //ejecuta la consulta
     sta.execute(consulta);
+    sta.execute(consulta2);
+    sta.execute(publicidad);
 
     //cierra el objeto auxiliar
     sta.close();
