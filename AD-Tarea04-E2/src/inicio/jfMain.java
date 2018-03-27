@@ -1,4 +1,4 @@
-package PaquetePrincipal;
+package inicio;
 
 //librerías JDBC
 import java.sql.*;
@@ -31,6 +31,8 @@ public class jfMain extends javax.swing.JFrame {
     
     //componentes especificados en la ficha 'Diseño'
     initComponents();
+    //Centrando la ventana en la pantalla
+    this.setLocationRelativeTo(null);
 
     //conexión
     Connection conn = null;
