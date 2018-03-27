@@ -95,36 +95,33 @@ public class jfMain extends javax.swing.JFrame {
    * @throws SQLException
    */
   private void crear_Tipos(Connection conn) throws SQLException {
+    //Comando auxiliar para ejecutar la consulta
+    Statement sta = conn.createStatement();
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //escribe la consulta SQL para construir el tipo 'vivienda', el tipo
     //'direccion', y la función 'publicidad', de acuerdo con las
     //indicaciones dadas
-    String consulta = "CREATE TYPE vivienda AS("
+    sta.execute("CREATE TYPE vivienda AS("
             + "planta INTEGER,"
             + "metros_2 INTEGER,"
             + "num_habitaciones INTEGER,"
             + "num_banios INTEGER,"
-            + "arrendador VARCHAR(25))";
+            + "arrendador VARCHAR(25))");
     
-    String consulta2 = "CREATE TYPE direccion AS("
+    sta.execute("CREATE TYPE direccion AS("
             + "calle VARCHAR(40),"
             + "ciudad VARCHAR(25),"
             + "provincia VARCHAR(25),"
-            + "codigo_postal VARCHAR(5))";
-    
-    String publicidad = "CREATE FUNCTION publicidad(vivienda) RETURNS varchar AS $$"
-            + "'Se alquila piso de '||SELECT $1.metros_2||' cuadrados en planta '|| $1.planta, "
-            + "||', con '||$1.num_habitaciones||' habitaciones y '||$1.num_banios||' baños.'";
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    
-    //comando auxiliar para ejecutar la consulta
-    Statement sta = conn.createStatement();
+            + "codigo_postal VARCHAR(5))");
 
-    //ejecuta la consulta
-    sta.execute(consulta);
-    sta.execute(consulta2);
-    sta.execute(publicidad);
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //crea la función que transforma el tipo estructurado en una cadena
+    sta.execute("CREATE FUNCTION publicidad(vivienda) RETURNS varchar AS "
+            + "$$SELECT 'Se alquila piso de '||$1.metros_2|| ' metros cuadrados"
+            + "en planta '||$1.planta||', con '||$1.num_habitaciones||' habitaciones y '"
+            + "|| $1.num_banios||' baños';$$"
+            + "LANGUAGE SQL");
 
     //cierra el objeto auxiliar
     sta.close();
@@ -138,18 +135,18 @@ public class jfMain extends javax.swing.JFrame {
    * @throws SQLException 
    */
   private void crear_Tabla(Connection conn) throws SQLException {
-
+    //comando auxiliar para ejecutar la consulta
+    Statement sta = conn.createStatement();
+    
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //escribe la consulta SQL para crear la tabla 'viviendas_alquiler' de acuerdo
     //con las indicaciones dadas
-    String consulta = "";
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    
-    //comando auxiliar para ejecutar la consulta
-    Statement sta = conn.createStatement();
-
     //ejecuta la consulta
-    sta.execute(consulta);
+    sta.execute("CREATE TABLE viviendas_alquiler("
+            + "vivienda_id serial, "
+            + "caracteristicas vivienda, "
+            + "ubicacion direccion);");
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     //cierra el objeto auxiliar
     sta.close();
@@ -162,20 +159,38 @@ public class jfMain extends javax.swing.JFrame {
    * @throws SQLException 
    */
   private void insertar_Registros(Connection conn) throws SQLException {
+    //comando auxiliar para ejecutar la consulta
+    Statement sta = conn.createStatement();
 
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //escribe una consulta SQL para insertar al menos 2 registros en la
     //tabla 'viviendas_alquiler', sin dejar ningún valor vacío (excepto el
     //auto-numeríco). Para construir los valores de las columnas de tipos 
     //estructurados emplea la función ROW()
-    String consulta = "";
-    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    sta.execute("INSERT INTO viviendas_alquiler(caracteristicas, ubicacion) VALUES ("
+            + "ROW(1, 80, 3, 2, 'Luisa Manuel Martin'),"
+            + "ROW('Calle Blas Infante 3', 'Vva. Rio y Minas', 'Sevilla', '41350'))");
     
-    //comando auxiliar para ejecutar la consulta
-    Statement sta = conn.createStatement();
-
-    //ejecuta la consulta
-    sta.execute(consulta);
+    sta.execute("INSERT INTO viviendas_alquiler(caracteristicas, ubicacion) VALUES ("
+            + "ROW(3, 120, 2, 1, 'Jose Tojeiro Manuel'),"
+            + "ROW('Calle Mesones 16', 'Tocina', 'Sevilla', '41340'))");
+    
+    sta.execute("INSERT INTO viviendas_alquiler(caracteristicas, ubicacion) VALUES ("
+            + "ROW(5, 110, 4, 1, 'Vicente Andrade Montiel'),"
+            + "ROW('Calle Extremadura 1', 'Cantillana', 'Sevilla', '41320'))");
+    
+    sta.execute("INSERT INTO viviendas_alquiler(caracteristicas, ubicacion) VALUES ("
+            + "ROW(2, 90, 3, 2, 'Josefa Gomez Grande'),"
+            + "ROW('Plaza Chito 4', 'Brenes', 'Sevilla', '41310'))");
+    
+    sta.execute("INSERT INTO viviendas_alquiler(caracteristicas, ubicacion) VALUES ("
+            + "ROW(2, 110, 3, 2, 'Maria Andrade Jimenez'),"
+            + "ROW('Avenida de Aguas Santas 13', 'Villaverde del Rio', 'Sevilla', '41315'))");
+    
+    sta.execute("INSERT INTO viviendas_alquiler(caracteristicas, ubicacion) VALUES ("
+            + "ROW(2, 50, 1, 1, 'Eulalio Cerezo Gomez'),"
+            + "ROW('Calle Tarragona 11', 'Vva. Rio y Minas', 'Sevilla', '41350'))");
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     //cierra el objeto auxiliar
     sta.close();
@@ -189,19 +204,17 @@ public class jfMain extends javax.swing.JFrame {
    * @throws SQLException 
    */
   private void rellenar_JComboBox(Connection conn) throws SQLException {
+    //comando auxiliar para ejecutar la consulta
+    Statement sta = conn.createStatement();
     
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //escribe una consulta SQL que devuelva todas las ciudades distintas 
     //presentes en el tipo compuesto 'direccion' de la columna 'ubicacion', 
     //ordenadas por nombre
-    String consulta = "";
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    
-    //comando auxiliar para ejecutar la consulta
-    Statement sta = conn.createStatement();
-
     //ejecuta la consulta para que devuelva un conjunto de registros
-    ResultSet res = sta.executeQuery(consulta);
+    ResultSet res = sta.executeQuery("SELECT DISTINCT (ubicacion).ciudad "
+            + "FROM viviendas_alquiler ORDER BY (ubicacion).ciudad ASC");
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     //límpia el jComboBox1...
     jComboBox1.removeAllItems();
@@ -224,25 +237,22 @@ public class jfMain extends javax.swing.JFrame {
    * @param ciudad
    * @throws SQLException 
    */
-  private void rellenar_JTable(Connection conn, Object ciudad) 
-          throws SQLException {
+  private void rellenar_JTable(Connection conn, Object ciudad) throws SQLException {
     
     if (ciudad != null) {
       //cuadrícula por defecto
       DefaultTableModel modelo = new DefaultTableModel();
       jTable1.setModel(modelo);
 
+      //comando auxiliar para ejecutar la consulta
+      Statement sta = conn.createStatement();
+      
       //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       //escribe una consulta SQL que devuelva todos los datos de las viviendas
       //alquiler ubicadas en la 'ciudad' recibida como parámetro
-      String consulta = " ";
+      ResultSet res = sta.executeQuery("SELECT * FROM viviendas_alquiler "
+              + "WHERE (viviendas_alquiler.ubicacion).ciudad='" + ciudad + "'");
       //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      
-      //comando auxiliar para ejecutar la consulta
-      Statement sta = conn.createStatement();
-
-      //ejecuta la consulta para que devuelva un conjunto de registros
-      ResultSet res = sta.executeQuery(consulta);
 
       //estructura del conjunto del registros
       ResultSetMetaData rsMd = res.getMetaData();
@@ -319,20 +329,16 @@ public class jfMain extends javax.swing.JFrame {
       //mediante la contraseña del usuario postgres
       conn = DriverManager.getConnection(url, "postgres", passwd);
 
+      //comando auxiliar para ejecutar la consulta
+      Statement sta = conn.createStatement();
+      
       //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       //escribe una consulta SQL que devuelva el valor de la función
       //'publicidad', sobre la columna 'caracteristicas' de la vivienda alquiler
       //de clave principal recibida como parámetro
-      String consulta = String.format(
-              "SELECT ... FROM viviendas_alquiler "
-              + "WHERE ...=%s", viviendaId);
+      ResultSet res = sta.executeQuery("SELECT publicidad(caracteristicas)"
+              + "FROM viviendas_alquiler WHERE vivienda_id = '" + viviendaId + "'");
       //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-      //comando auxiliar para ejecutar la consulta
-      Statement sta = conn.createStatement();
-
-      //ejecuta la consulta
-      ResultSet res = sta.executeQuery(consulta);
       
       //muestra el resultado
       while (res.next()) {
@@ -463,7 +469,7 @@ public class jfMain extends javax.swing.JFrame {
     //variable para la clave principal de una vivienda (iniciada en 0). Aunque
     //se trata de un tipo entero, se utiliza un Object para evitar conversiones
     //de tipos posteriores
-    Object viviendaId = 0;
+    Object viviendaId;
 
     try {
       //si hay alguna fila seleccionada en la cuadrícula
