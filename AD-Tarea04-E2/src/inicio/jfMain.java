@@ -20,7 +20,7 @@ public class jfMain extends javax.swing.JFrame {
   String url = "jdbc:postgresql://localhost/anaconda";
   
   //contraseña del usuario postgres para acceder a la base de datos anaconda
-  String passwd = "123456";
+  String passwd = "1234";
 
   /****************************************************************************
    * constructor del formulario con excepcion verificada de tipo SQLException
